@@ -121,7 +121,7 @@ void YncaClient::with_connection(std::function<void ()> func) {
 	catch(...) {}
 }
 
-void connect_loop(YncaClient &ynca, const std::string &input, const optional<std::string> &default_program) {
+void connect_loop(YncaClient &ynca, const std::string &scene, const std::string &input, const optional<std::string> &default_program) {
 	struct mpd_status *status = NULL;
 	enum mpd_state old_state, new_state;
 
@@ -134,6 +134,7 @@ void connect_loop(YncaClient &ynca, const std::string &input, const optional<std
 		straight_cmd = "@MAIN:STRAIGHT=On", \
 		input_get_cmd = "@MAIN:INP=?";
 
+	const std::string scene_put_cmd = "@MAIN:SCENE=" + scene;
 	const std::string input_put_cmd = "@MAIN:INP=" + input;
 
 	struct mpd_connection *conn = mpd_connection_new(NULL, 0, 0);
@@ -189,9 +190,9 @@ void connect_loop(YncaClient &ynca, const std::string &input, const optional<std
 			ynca.with_connection([&]() {
 				if (old_state != MPD_STATE_PLAY) {
 					// Power the receiver on and switch to the
-					// configured input when playback starts.
+					// configured scene when playback starts.
 					ynca.put_command(on_cmd);
-					ynca.put_command(input_put_cmd);
+					ynca.put_command(scene_put_cmd);
 				} else if (ynca.get_command(input_get_cmd).find(input_put_cmd + "\r\n") == std::string::npos) {
 					// Stop playback if the input has changed.
 					mpd_run_stop(conn);
@@ -247,7 +248,7 @@ error:
 	std::cerr << "MPD connection error: " << mpd_connection_get_error_message(conn) << std::endl;
 	mpd_connection_free(conn);
 	std::this_thread::sleep_for(std::chrono::seconds(1));
-	return connect_loop(ynca, input, default_program);
+	return connect_loop(ynca, scene, input, default_program);
 }
 
 int main() {
@@ -258,6 +259,7 @@ int main() {
 	config.add_options()
 		("host", po::value<std::string>(), "Yamaha AV hostname")
 		("port", po::value<int>()->default_value(50000), "Yamaha AV port")
+		("scene", po::value<std::string>(), "Yamaha AV scene for MPD")
 		("input", po::value<std::string>(), "Yamaha AV input for MPD")
 		("default-program", po::value(&default_program), "Yamaha AV default sound program name")
 		;
@@ -307,6 +309,11 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
+	if (!vm.count("scene")) {
+		std::cerr << "scene not set in " << *cf << "." << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	if (!vm.count("input")) {
 		std::cerr << "input not set in " << *cf << "." << std::endl;
 		return EXIT_FAILURE;
@@ -319,6 +326,7 @@ int main() {
 
 	connect_loop(
 		ynca,
+		vm["scene"].as<std::string>(),
 		vm["input"].as<std::string>(),
 		default_program
 	);
