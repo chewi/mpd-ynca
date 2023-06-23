@@ -7,9 +7,16 @@ threads = dependency('threads')
 executable(
     'mpd-ynca',
     'mpd-ynca.cpp',
-    cpp_args : '-DSYSCONFDIR=' + get_option('sysconfdir'),
-    dependencies : [boost, mpd, threads],
-    install : true
+    install : true,
+    cpp_args : [
+        '-DSYSCONFDIR=' + get_option('sysconfdir'),
+        '-Wno-infinite-recursion',
+    ],
+    dependencies : [
+        boost,
+        mpd,
+        threads
+    ]
 )
 
 install_data(
