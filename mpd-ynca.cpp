@@ -1,5 +1,5 @@
 // mpd-ynca - An MPD client to control Yamaha AV receivers
-// Copyright (C) 2020  James Le Cuirot <chewi@gentoo.org>
+// Copyright (C) 2020-2023  James Le Cuirot <chewi@gentoo.org>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,14 +20,12 @@
 #include <boost/program_options.hpp>
 #include <chrono>
 #include <cstdlib>
-#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <string>
 #include <thread>
-#include <vector>
 
 #include <errno.h>
 #include <mpd/capabilities.h>
