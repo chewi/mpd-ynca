@@ -5,6 +5,7 @@ An MPD client to control Yamaha AV receivers with YNCA (network control) support
 ## Features
 
 * Powers the receiver on and switches input when playback starts.
+* Delays playback for a configurable time while the receiver powers on.
 * Switches sound program to a per-song choice, "Straight" for multi-channel songs, or some default.
 * Configurable using an INI file.
 
