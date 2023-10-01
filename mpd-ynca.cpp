@@ -285,7 +285,7 @@ int main() {
 		("scene", po::value<std::string>(), "Yamaha AV scene for MPD")
 		("input", po::value<std::string>(), "Yamaha AV input for MPD")
 		("default-program", po::value(&default_program), "Yamaha AV default sound program name")
-		("startup-delay", po::value<unsigned int>()->default_value(5), "Startup delay")
+		("startup-delay", po::value<unsigned int>()->default_value(10), "Startup delay")
 		;
 
 	const std::filesystem::path *cf = nullptr;
