@@ -54,17 +54,20 @@ public:
 	void with_connection(std::function<void ()> func);
 
 private:
-	boost::asio::io_service io_service;
+	const std::string host;
+	const std::string port;
+
+	boost::asio::io_context io_context;
 	tcp::socket socket;
 	tcp::resolver resolver;
-	tcp::resolver::query resolver_query;
 };
 
 YncaClient::YncaClient(const std::string &host, const unsigned int port) :
-	io_service(),
-	socket(io_service),
-	resolver(io_service),
-	resolver_query(host, std::to_string(port))
+	host(host),
+	port(std::to_string(port)),
+	io_context(),
+	socket(io_context),
+	resolver(io_context)
 {
 }
 
@@ -108,7 +111,7 @@ void YncaClient::put_command(const std::string &command) {
 
 void YncaClient::with_connection(std::function<void ()> func) {
 	try {
-		tcp::resolver::iterator endpoints = resolver.resolve(resolver_query);
+		auto endpoints = resolver.resolve(host, port);
 		boost::asio::connect(socket, endpoints);
 		func();
 	} catch (std::exception &e) {
